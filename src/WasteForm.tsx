@@ -1,0 +1,270 @@
+import { useState } from "react";
+import { storage, db } from "./firebase.ts"; // Make sure to configure Firebase
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { addDoc, collection } from "firebase/firestore";
+import { useAuth } from "./authContext.tsx";
+
+const WasteForm = () => {
+  const [wasteName, setWasteName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState<any>(null);
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [disposalMethod, setdisposalMethod] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [wasteType, setWasteType] = useState("");
+  const [additionalWasteInfo, setAdditionalWasteInfo] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const { currentUser } = useAuth();
+
+  const userid = currentUser!.email;
+  // console.log(userid);
+
+  const handleImageChange = (e: any) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    if (!image) {
+      alert("Please upload an image.");
+      return;
+    }
+    const storageRef = ref(storage, `wasteImages/${image.name}`);
+    try {
+      // Upload the image to Firebase storage
+      await uploadBytes(storageRef, image);
+      const imageUrl = await getDownloadURL(storageRef);
+
+      // Save the waste data along with the image URL to Firestore
+      await addDoc(collection(db, "waste"), {
+        userid,
+        wasteName,
+        location,
+        date,
+        disposalMethod,
+        quantity,
+        wasteType,
+        imageUrl,
+        status: "pending",
+        amount: 0,
+        description,
+        additionalWasteInfo,
+        bankName,
+        accountNumber,
+      });
+
+      setSuccessMessage("Waste details and image uploaded successfully!");
+      setWasteName("");
+      setDescription("");
+      setLocation("");
+      setDate("");
+      setdisposalMethod("");
+      setQuantity("");
+      setWasteType("");
+      setImage(null);
+      setAdditionalWasteInfo("");
+      setBankName("");
+      setAccountNumber("");
+    } catch (error: any) {
+      console.error("Error uploading waste:", error);
+      setSuccessMessage(`An error occured : ${error!.message}`);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 ">
+      <div className="bg-white flex rounded-lg shadow-lg w-4/5 overflow-hidden">
+        {/* Picture Section */}
+        <div className="w-1/2 flex items-center justify-center p-8">
+          <img
+            src="waste_management.jpg" // Replace this with the appropriate image URL
+            alt="Waste"
+            className="object-contain "
+          />
+        </div>
+
+        {/* Form Section */}
+        <div className="w-1/2 p-8">
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Waste Management Form
+          </h2>
+          {successMessage && (
+            <p className="text-green-500 mb-4">{successMessage}</p>
+          )}
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 overflow-y-auto h-[70vh]"
+          >
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Waste Name
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter the name of the waste"
+                value={wasteName}
+                onChange={(e: any) => setWasteName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                className="w-full p-2 border rounded-lg"
+                onChange={handleImageChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium">Location</label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter the location"
+                value={location}
+                onChange={(e: any) => setLocation(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <div>
+                <label className="block mb-2 text-sm font-medium">Date</label>
+                <input
+                  type="date"
+                  className="w-full p-2 border rounded-lg"
+                  value={date}
+                  onChange={(e: any) => setDate(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Disposal Method
+              </label>
+
+              <select
+                className="w-full p-2 border rounded-lg"
+                value={disposalMethod}
+                onChange={(e: any) => setdisposalMethod(e.target.value)}
+                required
+              >
+                <option value="">Select Disposal Method</option>
+                <option value="Plastic">Recycling</option>
+                <option value="Organic">Landfill</option>
+                <option value="Electronic">Incineration</option>
+                <option value="Metal">Biological Metal Treatment</option>
+                <option value="Organic">Burning</option>
+                <option value="Organic">Others</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium">Quantity</label>
+              <input
+                type="number"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter the quantity"
+                value={quantity}
+                onChange={(e: any) => setQuantity(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Waste Type
+              </label>
+              <select
+                className="w-full p-2 border rounded-lg"
+                value={wasteType}
+                onChange={(e: any) => setWasteType(e.target.value)}
+                required
+              >
+                <option value="">Select Waste Type</option>
+                <option value="Plastic">Plastic</option>
+                <option value="Organic">Organic</option>
+                <option value="Electronic">Electronic</option>
+                <option value="Metal">Metal</option>
+              </select>
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Description
+              </label>
+              <textarea
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter Waste Description"
+                value={description}
+                onChange={(e: any) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Additional Information
+              </label>
+              <textarea
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter any additional information"
+                value={additionalWasteInfo}
+                onChange={(e: any) => setAdditionalWasteInfo(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Bank Name
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter the Bank Name"
+                value={bankName}
+                onChange={(e: any) => setBankName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Account Number
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter the Bank Name"
+                value={accountNumber}
+                onChange={(e: any) => setAccountNumber(e.target.value)}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            >
+              Submit Waste
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WasteForm;
