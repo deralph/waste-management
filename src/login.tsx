@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
+  // GoogleAuthProvider,
+  // signInWithPopup,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "./firebase.ts";
@@ -51,15 +51,15 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      // Redirect or notify user after Google login
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
+  // const handleGoogleLogin = async () => {
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     await signInWithPopup(auth, provider);
+  //     // Redirect or notify user after Google login
+  //   } catch (err: any) {
+  //     setError(err.message);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-800 flex items-center justify-center ">
