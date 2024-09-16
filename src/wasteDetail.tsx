@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Import Firestore methods
 import { db } from "./firebase"; // Adjust the path as per your setup
 
 interface WasteItem {
+  id: string;
   userid: string;
   wasteName: string;
   location: string;
@@ -25,6 +26,7 @@ const WasteDetailsPage: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
   const [additionalInfo, setAdditionalInfo] = useState<string>("");
 
+  const navigate = useNavigate();
   // Fetch the waste item from Firebase
   const fetchWasteItem = async () => {
     const wasteDoc = doc(db, "waste", id!); // Use Firestore modular syntax
@@ -33,23 +35,6 @@ const WasteDetailsPage: React.FC = () => {
     if (wasteSnap.exists()) {
       setWasteItem({ userid: wasteSnap.id, ...wasteSnap.data() } as WasteItem);
     } else {
-      setWasteItem({
-        userid: "2",
-        wasteName: "Cow wastes",
-        location: "obj",
-        date: "2024-09-03",
-        wasteType: "Organic",
-        imageUrl: "https://via.placeholder.com/150",
-        quantity: 5,
-        disposalMethod: "Drop-off",
-        status: "approved",
-        description:
-          "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores aliquid, rem laudantium molestias culpa ducimus exercitationem quo quod necessitatibus? Dicta eius deleniti officia consequatur magni. Reiciendis soluta repudiandae sunt ab ad ipsa, sit sapiente esse sint nulla quis labore, dolorum quidem pariatur, eaque animi quas magni perspiciatis suscipit! Neque, a vel tempore voluptatum est possimus molestias ullam odio asperiores dolores ipsam in enim ab reiciendis cumque nam provident, perferendis assumenda mollitia. Sed consequuntur repellendus saepe velit accusantium vero non. Accusamus ab aliquam soluta! Iusto alias perferendis dolore in fugiat quis itaque mollitia. Consequuntur nam maiores doloremque, harum ipsum est dolor. ",
-        additionalWasteInfo:
-          "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores aliquid, rem laudantium molestias culpa ducimus exercitationem quo quod necessitatibus? Dicta eius deleniti officia consequatur magni. Reiciendis soluta repudiandae sunt ab ad ipsa, sit sapiente esse sint nulla quis labore, dolorum quidem pariatur, eaque animi quas magni perspiciatis suscipit! Neque, a vel tempore voluptatum est possimus molestias ullam odio asperiores dolores ipsam in enim ab reiciendis cumque nam provident, perferendis assumenda mollitia. Sed consequuntur repellendus saepe velit accusantium vero non. Accusamus ab aliquam soluta! Iusto alias perferendis dolore in fugiat quis itaque mollitia. Consequuntur nam maiores doloremque, harum ipsum est dolor.",
-        bankName: "Eco bank",
-        accountNumber: "22102200000",
-      });
       console.log("No such waste item found");
     }
   };
@@ -60,25 +45,64 @@ const WasteDetailsPage: React.FC = () => {
     }
   }, [id]);
 
-  // Approve waste item
   const handleApprove = async () => {
     if (wasteItem) {
-      const wasteDoc = doc(db, "waste", wasteItem.userid);
-      await updateDoc(wasteDoc, {
-        status: "approved",
-      });
-      alert("Waste approved");
+      // Firebase logic for approving the waste
+      try {
+        await updateDoc(doc(db, "waste", wasteItem.id), {
+          status: "approved",
+          approvedAt: new Date(),
+        });
+        // Extract necessary details
+        const email = wasteItem.userid;
+        const wasteDescription = wasteItem.description;
+        const awardedPrice = amount;
+
+        // Construct the mailto link
+        const mailtoLink = `mailto:${email}?subject=Waste Approval Notification&body=Dear esteemed user ,%0D%0A%0D%0AWe are pleased to inform you that your waste submission has been approved!%0D%0A%0D%0AWaste Description: ${wasteDescription}%0D%0AAwarded Price: $${awardedPrice}%0D%0AAdditional Info: ${additionalInfo}%0D%0A%0D%0AThank you for your contribution to making our environment cleaner!%0D%0A%0D%0ABest regards,%0D%0AThe Waste Management Team`;
+
+        // Open the mailto link in a new tab
+        window.location.href = mailtoLink;
+        alert("Waste approved");
+        navigate("/admin/approve");
+      } catch (error: any) {
+        console.error("Error approving waste: ", error);
+        alert(`Error approving waste:  ${error}!`);
+      }
+    } else {
+      console.log("invalid waste page");
     }
   };
 
-  // Reject waste item
   const handleReject = async () => {
+    // Firebase logic for rejecting the waste
     if (wasteItem) {
-      const wasteDoc = doc(db, "waste", wasteItem.userid);
-      await updateDoc(wasteDoc, {
-        status: "rejected",
-      });
-      alert("Waste rejected");
+      try {
+        await updateDoc(doc(db, "waste", wasteItem.id), {
+          status: "rejected",
+          rejectedAt: new Date(),
+        });
+
+        // Extract necessary details
+        const email = wasteItem.userid;
+        const wasteDescription = wasteItem.description;
+
+        // Construct the mailto link
+        const mailtoLink = `mailto:${email}?subject=Waste Rejection Notification&body=Dear esteemed user,%0D%0A%0D%0AWe regret to inform you that your waste submission has been rejected.%0D%0A%0D%0AWaste Description: ${wasteDescription}%0D%0AReason: ${
+          additionalInfo ||
+          "Unfortunately, your submission does not meet our criteria at this time."
+        }%0D%0A%0D%0AWe encourage you to review our guidelines and submit again in the future.%0D%0A%0D%0AThank you for your understanding,%0D%0A%0D%0ABest regards,%0D%0AThe Waste Management Team`;
+
+        // Open the mailto link in a new tab
+        window.location.href = mailtoLink;
+        alert("Waste rejected");
+        navigate("/admin/approve");
+      } catch (error) {
+        console.error("Error rejecting waste: ", error);
+        alert(`Error rejecting waste: ", ${error} `);
+      }
+    } else {
+      console.log("invalid waste page");
     }
   };
 
@@ -164,7 +188,7 @@ const WasteDetailsPage: React.FC = () => {
           </div>
           <div>
             <label className="block mb-2 text-sm font-medium">
-              Additional Infor mation for the user
+              Additional Information for the user
             </label>
             <textarea
               className="w-full p-2 border rounded-lg"
