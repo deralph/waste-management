@@ -27,9 +27,9 @@ const WasteApprovalCard: React.FC<Props> = ({
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const handleImageClick = () => {
-    setModalOpen(true);
-  };
+  // const handleImageClick = () => {
+  //   setModalOpen(true);
+  // };
 
   const closeModal = () => {
     setModalOpen(false);
