@@ -6,6 +6,7 @@ import WasteForm from "./WasteForm";
 import Login from "./login";
 import WasteDetailsPage from "./wasteDetail";
 import AdminApproval from "./adminApproval";
+import WasteDashboard from "./userPage";
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,10 @@ const App: React.FC = () => {
           <Route
             path="/wasteForm"
             element={<ProtectedRoute element={<WasteForm />} />}
+          />
+          <Route
+            path="/userpage"
+            element={<ProtectedRoute element={<WasteDashboard />} />}
           />
           <Route
             path="/waste/:id"

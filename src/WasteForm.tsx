@@ -10,18 +10,14 @@ const WasteForm = () => {
   const [image, setImage] = useState<any>(null);
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
-  const [disposalMethod, setdisposalMethod] = useState("");
   const [quantity, setQuantity] = useState("");
   const [wasteType, setWasteType] = useState("");
   const [additionalWasteInfo, setAdditionalWasteInfo] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [bankName, setBankName] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const { currentUser } = useAuth();
 
   const userid = currentUser!.email;
-  // console.log(userid);
 
   const handleImageChange = (e: any) => {
     if (e.target.files[0]) {
@@ -48,16 +44,13 @@ const WasteForm = () => {
         wasteName,
         location,
         date,
-        disposalMethod,
         quantity,
         wasteType,
         imageUrl,
         status: "pending",
-        amount: 0,
+        point: 0,
         description,
         additionalWasteInfo,
-        bankName,
-        accountNumber,
       });
 
       setSuccessMessage("Waste details and image uploaded successfully!");
@@ -65,13 +58,10 @@ const WasteForm = () => {
       setDescription("");
       setLocation("");
       setDate("");
-      setdisposalMethod("");
       setQuantity("");
       setWasteType("");
       setImage(null);
       setAdditionalWasteInfo("");
-      setBankName("");
-      setAccountNumber("");
     } catch (error: any) {
       console.error("Error uploading waste:", error);
       setSuccessMessage(`An error occured : ${error!.message}`);
@@ -79,29 +69,26 @@ const WasteForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 ">
-      <div className="bg-white flex rounded-lg shadow-lg w-4/5 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+      <div className="bg-white flex flex-col md:flex-row rounded-lg shadow-lg w-full lg:w-4/5 overflow-hidden">
         {/* Picture Section */}
-        <div className="w-1/2 flex items-center justify-center p-8">
+        <div className="md:w-1/2 flex items-center justify-center p-8">
           <img
             src="waste_management.jpg" // Replace this with the appropriate image URL
             alt="Waste"
-            className="object-contain "
+            className="object-contain max-h-60 md:max-h-full"
           />
         </div>
 
         {/* Form Section */}
-        <div className="w-1/2 p-8">
-          <h2 className="text-2xl font-bold text-center mb-8">
+        <div className="md:w-1/2 p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-center mb-6">
             Waste Management Form
           </h2>
           {successMessage && (
-            <p className="text-green-500 mb-4">{successMessage}</p>
+            <p className="text-green-500 mb-4 text-center">{successMessage}</p>
           )}
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6 overflow-y-auto h-[70vh]"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block mb-2 text-sm font-medium">
                 Waste Name
@@ -154,27 +141,6 @@ const WasteForm = () => {
             </div>
 
             <div>
-              <label className="block mb-2 text-sm font-medium">
-                Disposal Method
-              </label>
-
-              <select
-                className="w-full p-2 border rounded-lg"
-                value={disposalMethod}
-                onChange={(e: any) => setdisposalMethod(e.target.value)}
-                required
-              >
-                <option value="">Select Disposal Method</option>
-                <option value="Plastic">Recycling</option>
-                <option value="Organic">Landfill</option>
-                <option value="Electronic">Incineration</option>
-                <option value="Metal">Biological Metal Treatment</option>
-                <option value="Organic">Burning</option>
-                <option value="Organic">Others</option>
-              </select>
-            </div>
-
-            <div>
               <label className="block mb-2 text-sm font-medium">Quantity</label>
               <input
                 type="number"
@@ -203,6 +169,7 @@ const WasteForm = () => {
                 <option value="Metal">Metal</option>
               </select>
             </div>
+
             <div>
               <label className="block mb-2 text-sm font-medium">
                 Description
@@ -215,6 +182,7 @@ const WasteForm = () => {
                 required
               />
             </div>
+
             <div>
               <label className="block mb-2 text-sm font-medium">
                 Additional Information
@@ -224,32 +192,6 @@ const WasteForm = () => {
                 placeholder="Enter any additional information"
                 value={additionalWasteInfo}
                 onChange={(e: any) => setAdditionalWasteInfo(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium">
-                Bank Name
-              </label>
-              <input
-                type="text"
-                className="w-full p-2 border rounded-lg"
-                placeholder="Enter the Bank Name"
-                value={bankName}
-                onChange={(e: any) => setBankName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium">
-                Account Number
-              </label>
-              <input
-                type="text"
-                className="w-full p-2 border rounded-lg"
-                placeholder="Enter the Bank Name"
-                value={accountNumber}
-                onChange={(e: any) => setAccountNumber(e.target.value)}
                 required
               />
             </div>

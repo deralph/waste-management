@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/wasteForm" />;
+    return <Navigate to="/userpage" />;
   }
 
   return <>{element}</>;

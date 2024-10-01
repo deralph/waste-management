@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (user) {
         // Add your logic to determine if the user is an admin
         // For example, check if the user's email is in the admin list
-        const adminEmails = ["jraphael441@gmail.com", "admin@mail.com"]; // Example admin emails
+        const adminEmails = ["jraphael41@gmail.com", "admin@mail.com"]; // Example admin emails
         setIsAdmin(adminEmails.includes(user.email || ""));
       } else {
         setIsAdmin(false);
