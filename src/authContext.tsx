@@ -5,8 +5,9 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { auth } from "./firebase"; // Assuming Firebase is configured in firebase.ts
+import { auth, db } from "./firebase"; // Assuming Firebase is configured in firebase.ts
 import { onAuthStateChanged, User } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 // Define the context type
 interface AuthContextType {
@@ -27,14 +28,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       console.log("user in context = ", user);
       if (user) {
-        // Add your logic to determine if the user is an admin
-        // For example, check if the user's email is in the admin list
-        const adminEmails = ["jraphael41@gmail.com", "admin@mail.com"]; // Example admin emails
-        setIsAdmin(adminEmails.includes(user.email || ""));
+        console.log(user.email);
+        // Fetch the user's role from Firestore
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", user.email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          console.log("User role: ", userData.role);
+
+          // Navigate based on user role
+          if (userData.role === "admin") {
+            setIsAdmin(true);
+          }
+        } else {
+          console.error("No user role found.");
+        }
       } else {
         setIsAdmin(false);
       }

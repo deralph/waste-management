@@ -8,7 +8,6 @@ const WasteForm = () => {
   const [wasteName, setWasteName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<any>(null);
-  const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [quantity, setQuantity] = useState("");
   const [wasteType, setWasteType] = useState("");
@@ -42,7 +41,6 @@ const WasteForm = () => {
       await addDoc(collection(db, "waste"), {
         userid,
         wasteName,
-        location,
         date,
         quantity,
         wasteType,
@@ -56,7 +54,6 @@ const WasteForm = () => {
       setSuccessMessage("Waste details and image uploaded successfully!");
       setWasteName("");
       setDescription("");
-      setLocation("");
       setDate("");
       setQuantity("");
       setWasteType("");
@@ -111,18 +108,6 @@ const WasteForm = () => {
                 type="file"
                 className="w-full p-2 border rounded-lg"
                 onChange={handleImageChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 text-sm font-medium">Location</label>
-              <input
-                type="text"
-                className="w-full p-2 border rounded-lg"
-                placeholder="Enter the location"
-                value={location}
-                onChange={(e: any) => setLocation(e.target.value)}
                 required
               />
             </div>

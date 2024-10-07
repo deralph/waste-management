@@ -154,7 +154,15 @@ const AdminApproval: React.FC = () => {
 
   return (
     <div className="flex flex-col  p-6 bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4 ">Waste Management Approval</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold mb-4 ">Waste Management Approval</h1>
+        <button
+          onClick={() => navigate("/create-admin")}
+          className=" py-2 px-6 bg-black text-white rounded-md hover:bg-gray-900 transition"
+        >
+          Create Admin
+        </button>
+      </div>
       <div className="flex justify-evenly flex-wrap">
         {wasteItems.map((item) => (
           <WasteApprovalCard

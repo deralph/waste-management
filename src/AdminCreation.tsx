@@ -1,53 +1,29 @@
 import { useState } from "react";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./firebase.ts";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
-import { useAuth } from "./authContext.tsx";
 
-const Login = () => {
+const AdminCreation = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [Admin, setAdmin] = useState(false); // New state for admin sign-up
 
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
 
     try {
-      if (isSignUp) {
-        // Create a new user and assign the role
-        const user = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        await addDoc(collection(db, "users"), {
-          email,
-          role: Admin ? "admin" : "user", // Assign role based on Admin state
-        });
-        console.log("User signed up: ", user);
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db, "users"), {
+        email,
+        role: "admin",
+      });
+      console.log("User created up: ", user);
 
-        navigate("/userpage"); // Navigate to user page for normal users
-      } else {
-        // User login logic
-        const user = await signInWithEmailAndPassword(auth, email, password);
-        console.log("User logged in: ", user);
-
-        if (isAdmin) {
-          navigate("/admin/approve"); // Navigate to admin dashboard
-        } else {
-          navigate("/userpage"); // Navigate to the user page
-        }
-      }
+      navigate("/admin/approve"); // Navigate to user page for normal users
     } catch (err: any) {
       setError(err.message);
     }
@@ -70,7 +46,7 @@ const Login = () => {
           {/* Right Form Section */}
           <div className="w-full md:w-1/2 p-6 md:p-8">
             <h2 className="text-red-900 text-2xl font-bold text-center mb-8">
-              {isSignUp ? "Create an Account" : "Welcome back!"}
+              Create an admin account
             </h2>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <form onSubmit={handleSubmit}>
@@ -107,34 +83,10 @@ const Login = () => {
                 />
               </div>
 
-              {!isSignUp && (
-                <div className="mb-4">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
-                      checked={Admin}
-                      onChange={(e) => setAdmin(e.target.checked)}
-                    />
-                    <span className="ml-2">Sign in as Admin</span>
-                  </label>
-                </div>
-              )}
-
               <button className="w-full py-2 bg-black text-white rounded-md hover:bg-gray-900 transition">
-                {isSignUp ? "Sign Up" : "Log In"}
+                Create
               </button>
             </form>
-            <div className="my-4"></div>
-            <p className="text-center text-sm">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}
-              <button
-                className="underline ml-1"
-                onClick={() => setIsSignUp(!isSignUp)}
-              >
-                {isSignUp ? "Log In" : "Sign Up"}
-              </button>
-            </p>
           </div>
         </div>
       </div>
@@ -142,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminCreation;

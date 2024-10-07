@@ -130,17 +130,14 @@ const WasteDetailsPage: React.FC = () => {
                 <span className="font-semibold"> User: </span>
                 {wasteItem.userid}
               </p>
-              <p className="mb-2">
-                <span className="font-semibold"> Quantity: </span>
-                {wasteItem.quantity}
-              </p>
+
               <p className="mb-2">{wasteItem.date}</p>
             </div>
 
             <div>
               <p className="mb-2">
-                <span className="font-semibold"> Location: </span>
-                {wasteItem.location}
+                <span className="font-semibold"> Quantity: </span>
+                {wasteItem.quantity}
               </p>
               <p className="mb-2">
                 <span className="font-semibold"> Status: </span>

@@ -7,6 +7,7 @@ import Login from "./login";
 import WasteDetailsPage from "./wasteDetail";
 import AdminApproval from "./adminApproval";
 import WasteDashboard from "./userPage";
+import AdminCreation from "./AdminCreation";
 
 const App: React.FC = () => {
   return (
@@ -37,6 +38,12 @@ const App: React.FC = () => {
             path="/admin/approve"
             element={
               <ProtectedRoute element={<AdminApproval />} requireAdmin />
+            }
+          />
+          <Route
+            path="/create-admin"
+            element={
+              <ProtectedRoute element={<AdminCreation />} requireAdmin />
             }
           />
         </Routes>
